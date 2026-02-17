@@ -3,7 +3,7 @@ from discord import app_commands
 import os
 from discord.ext import commands
 from dotenv import load_dotenv
-from modulos import buscar_player, hubFaceit, membroHub, MatchFaceit
+from modulos import buscar_player, hubFaceit, membroHub, MatchFaceit,playerMixcamp,marcarPartida,listarPartidasMarcadas
 
 load_dotenv()
 
@@ -210,6 +210,114 @@ async def infoMatch(interaction: discord.Interaction, match_id: str):
 # ---------- MIXCAMP
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+# ------ INFO PLAYER MIXCAMP
+@bot.tree.command(name='infoplayermix', description='buscar informações sobre o player no MixCamp. (Somente para admins e CEO)')
+
+@app_commands.checks.has_any_role(CEO, ADM)
+async def infoPlayerMix(interaction: discord.Interaction, nickname: str):
+    playerDados = playerMixcamp(nickname)
+    if playerDados['status']:
+        await interaction.response.send_message(f"""
+        **Olá {interaction.user.mention}! ✅ Player localizado, informações abaixo:**
+        ```
+        =-=-=-=-=-=-=-=-🏆 MIXCAMP 🏆=-=-=-=-=-=-=-=-=-=
+        🆔 Player ID: {playerDados['userDados']['usuario']['id']}
+        🆔 Steam ID: {playerDados['userDados']['usuario']['steamid']}
+        🆔 Faceit ID: {playerDados['userDados']['usuario']['faceitid']}
+        👤 Nickname: {playerDados['userDados']['usuario']['username']}
+        📧 Email: {playerDados['userDados']['usuario']['email']}
+        📆 Data de Criação: {playerDados['userDados']['usuario']['data_criacao']}
+        🎯 Posição: {playerDados['userDados']['usuario']['posicao']}
+        ⚔️ Gerencia: {playerDados['userDados']['usuario']['gerencia']}
+        🎨 Cores de Perfil: {playerDados['userDados']['usuario']['cores_perfil']}
+        ⚙️ Organizador: {playerDados['userDados']['usuario']['organizador']}
+        =-=-=-=-=-=-=-=-🏆 TEAM 🏆=-=-=-=-=-=-=-=-=-=
+        🆔 Time ID: {playerDados['userDados']['usuario']['time_id']}
+        🥋 Time: {playerDados['userDados']['time']['nome']}
+        🔖 Tag: {playerDados['userDados']['time']['tag']}
+        =-=-=-=-=-=-=-=-🏆 REDES SOCIAIS 🏆=-=-=-=-=-=-=-=-=-=
+        🔗 Discord: {playerDados['userDados']['redesSociais'][0]['discord_url']}
+        🔗 YouTube: {playerDados['userDados']['redesSociais'][0]['youtube_url']}
+        🔗 Instagram: {playerDados['userDados']['redesSociais'][0]['instagram_url']}
+        🔗 Twitter: {playerDados['userDados']['redesSociais'][0]['twitter_url']}
+        🔗 Twitch: {playerDados['userDados']['redesSociais'][0]['twitch_url']}
+        🔗 Faceit: {playerDados['userDados']['redesSociais'][0]['faceit_url']}
+        🔗 Gamesclub: {playerDados['userDados']['redesSociais'][0]['gamesclub_url']}
+        🔗 Steam: {playerDados['userDados']['redesSociais'][0]['steam_url']}
+        🔗 TikTok: {playerDados['userDados']['redesSociais'][0]['tiktok_url']}
+        🔗 Kick: {playerDados['userDados']['redesSociais'][0]['kick_url']}
+        🔗 Allstar: {playerDados['userDados']['redesSociais'][0]['allstar_url']}
+        ```
+        🖼 Avatar: {playerDados['userDados']['usuario']['avatar_url']}
+
+
+        """, ephemeral=True)
+    else:
+        await interaction.response.send_message(f"""
+        **Olá {interaction.user.mention}! ❌{playerDados['mensagem']}** """, ephemeral=True)
+
+
+# ------ MARCAR HORARIO DA PARTIDA
+@bot.tree.command(name='agendarjogos', description="Marca horário da partida entre equipes (ex: 19:00, 16/02/2026, FURIA, MIBR)"
+)
+async def marcarHorario(interaction: discord.Interaction, horario: str, data: str, equipe1: str, equipe2: str):
+
+    if len(horario) == 5 and len(data) == 10 and len(equipe1) > 0 and len(equipe2) > 0:
+        horarioMarcado = marcarPartida(horario,data,equipe1,equipe2)
+        if horarioMarcado:
+            await interaction.response.send_message(f"""
+            **Olá {interaction.user.mention}! ✅ Horário marcado com sucesso!**
+            ```
+            =-=-=-=-=-=-=-=-🏆 MIXCAMP 🏆=-=-=-=-=-=-=-=-=-=
+            🕒 Horario: {horario}
+            🆔 Data: {data}
+            TEAMS: {equipe1} 🆚 {equipe2} 
+            ```
+            """, ephemeral=True)
+        else:
+            await interaction.response.send_message(f"""
+            **Olá {interaction.user.mention}! ❌ Erro ao marcar horário!** """, ephemeral=True)
+    else:
+        await interaction.response.send_message(f"""
+        **Olá {interaction.user.mention}! ❌ Horário, data ou equipe inválida!** """, ephemeral=True)
+
+# ------ LISTAR PARTIDAS MARCADAS
+@bot.tree.command(name='partidasmarcadas', description="Lista todas as partidas marcadas ou a do dia atual"
+)
+
+@app_commands.choices(
+    periodo=[
+        app_commands.Choice(name="Hoje", value="hoje"),
+        app_commands.Choice(name="Essa semana", value="semana"),
+        app_commands.Choice(name="Todas", value="todas")
+    ]
+)
+async def mostrarPartidasMarcadas(interaction: discord.Interaction,periodo: app_commands.Choice[str]):
+    if periodo.value not in ["hoje", "semana", "todas"]:
+        await interaction.response.send_message("Período inválido ❌", ephemeral=True)
+        return
+
+    partidas = listarPartidasMarcadas(periodo.value)
+    
+
+    if not partidas["status"]:
+        await interaction.response.send_message(partidas["mensagem"], ephemeral=True)
+        return
+
+    msg = f"**Olá {interaction.user.mention}! ✅ Partidas encontradas:**\n"
+
+    for item in partidas["dados"]:
+        msg += f"""
+        ```
+        =-=-=-=-=-=-=-=-🏆 MIXCAMP 🏆=-=-=-=-=-=-=-=-=-=
+        ▶️ Selecionado: {periodo.value}
+        🕒 Horario: {item['horario']}
+        🆔 Data: {item['data']}
+        TEAMS: {item['equipe1']} 🆚 {item['equipe2']} 
+        ```
+        """
+    await interaction.response.send_message(msg, ephemeral=True)
+   
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # ---------- START BOT
 if __name__ == "__main__":

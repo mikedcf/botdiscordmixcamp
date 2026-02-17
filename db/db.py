@@ -1,10 +1,10 @@
 import sqlite3
 
-def conectar(query):
-    conexao = sqlite3.connect("mixcamp.db")
+def conectar(query, params=()):
+    conexao = sqlite3.connect("db/sql/mixcamp.db")
     cursor = conexao.cursor()
 
-    cursor.execute(query)
+    cursor.execute(query, params)
     response = cursor.fetchall()
     conexao.commit()
     
