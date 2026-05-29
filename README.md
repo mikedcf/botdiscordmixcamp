@@ -1,79 +1,123 @@
 # MixCamp Discord Bot
 
-Bot do Discord desenvolvido para o MixCamp, oferecendo funcionalidades de gerenciamento de canais e integração com a API do Faceit para buscar informações sobre jogadores, hubs e partidas.
+Bot do Discord desenvolvido para o **MixCamp**, integrando o servidor da comunidade com o site e a API do MixCamp, além da API do Faceit. Oferece vinculação de contas, perfis, tickets de suporte, agendamento de partidas, gerenciamento de cargos/canais e ferramentas administrativas.
 
-## 📋 Índice
+## Índice
 
 - [Funcionalidades](#funcionalidades)
 - [Tecnologias](#tecnologias)
 - [Pré-requisitos](#pré-requisitos)
 - [Instalação](#instalação)
 - [Configuração](#configuração)
+- [Primeira execução](#primeira-execução)
 - [Uso](#uso)
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Comandos](#comandos)
+- [Banco de Dados](#banco-de-dados)
+- [Segurança](#segurança)
+- [Troubleshooting](#troubleshooting)
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
-### Gerenciamento de Canais
-- **Criar Canais**: Cria categorias e canais para os times do MixCamp (LEGALIZE e VAC5)
-- **Deletar Canais**: Remove categorias e canais dos times
+### Integração com o MixCamp
+- **Vinculação de conta**: painel com botão/modal para o usuário enviar o link do perfil no site
+- **Sincronização de perfil**: atualiza nickname, cargos de time e cargo de verificado com base nos dados da API
+- **Painel de perfil**: botão para atualizar informações exibidas no Discord após mudanças no site
+- **Consulta de jogador**: busca dados completos de um player cadastrado no MixCamp (staff)
+- **Cargos de times**: cria cargos automaticamente com base nos times registrados no site
+- **Agendamento de partidas**: painel interativo para marcar confrontos entre equipes
+- **Listagem de agendamentos**: exibe partidas de hoje, da semana ou todas as próximas
 
-### Integração Faceit
-- **Informações de Jogador**: Busca dados completos do perfil de um jogador no Faceit
-- **Informações de Hub**: Obtém detalhes sobre uma hub específica
-- **Informações de Membro**: Verifica se um jogador é membro de uma hub
-- **Informações de Partida**: Busca dados sobre partidas em uma hub
+### Sistema de suporte
+- **Tickets**: categorias, canais e painel com opções (bug, report, técnico, sugestão, dúvidas)
+- **Canais administrativos**: logs, solicitações, chat staff, chegou/vazou, reunião em voz
+- **Webhooks**: notificações automáticas em canais configurados
 
-## 🛠️ Tecnologias
+### Gerenciamento do servidor
+- **Configuração base**: cria e registra cargos essenciais (STAFF, MODERADOR, Verificado, STREAMER, PASSE-LIVRE)
+- **Estrutura completa**: comando para montar categorias de boas-vindas, suporte e área staff
+- **Canais de times**: cria/remove categorias e canais para times específicos (LEGALIZE e VAC5)
 
-- **Python 3.x**
-- **discord.py** - Biblioteca para interação com a API do Discord
-- **requests** - Para requisições HTTP à API do Faceit
-- **python-dotenv** - Gerenciamento de variáveis de ambiente
-- **sqlite3** - Banco de dados SQLite
+### Ferramentas extras
+- **MIX amistoso**: sorteia aleatoriamente 10 jogadores entre dois times informados
+- **Integração Faceit**: consulta de jogador, hub, membro de hub e partida
 
-## 📦 Pré-requisitos
+## Tecnologias
+
+- **Python 3.8+**
+- **discord.py** — interação com a API do Discord (slash commands, views, modals)
+- **requests** — requisições HTTP síncronas (Faceit e MixCamp)
+- **aiohttp** — requisições HTTP assíncronas
+- **python-dotenv** — variáveis de ambiente
+- **SQLite** — persistência local (`db/sql/mixcamp.db`)
+
+## Pré-requisitos
 
 - Python 3.8 ou superior
-- Conta no Discord Developer Portal
+- Conta no [Discord Developer Portal](https://discord.com/developers/applications)
 - Token do bot do Discord
 - API Key do Faceit
+- API Key do MixCamp e URLs das rotas da API (backend do site)
 
-## 🔧 Instalação
+## Instalação
 
-1. Clone o repositório ou baixe os arquivos do projeto
+1. Clone o repositório ou baixe os arquivos do projeto.
 
 2. Instale as dependências:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+3. Crie um arquivo `.env` na raiz do projeto (veja [Configuração](#configuração)).
+
+4. Garanta que o diretório `db/sql/` exista. O banco `mixcamp.db` é criado/usado automaticamente pelo bot.
+
+## Configuração
+
+### Variáveis de ambiente (`.env`)
+
 ```env
+# Discord
 BotDicord=SEU_TOKEN_DO_BOT_DISCORD
+
+# Faceit
 ApiKeyFACEIT=SUA_API_KEY_DO_FACEIT
+
+# MixCamp
+ApiKeyMIXCAMP=SUA_API_KEY_DO_MIXCAMP
+
+# Webhooks e rotas da API MixCamp
+ROUTE_PERFIL_WEHOOK=URL_DO_WEBHOOK_PERFIL
+ROUTE_MIXCAMP_API_TIMES=URL_DA_API_DE_TIMES
+ROUTE_MIXCAMP_API_PERFIL=URL_DA_API_DE_PERFIL
+ROUTE_MIXCAMP_API_USER_COMPLETO=URL_DA_API_USER_COMPLETO
+ROUTE_MIXCAMP_API_SEASONS=URL_DA_API_SEASONS
+ROUTE_MIXCAMP_API_AGENDAMENTOS=URL_DA_API_AGENDAMENTOS
+ROUTE_MIXCAMP_API_USERS_ALL=URL_DA_API_USERS
+ROUTE_MARCACOES_JOGOS_CRIAR=URL_DA_API_CRIAR_AGENDAMENTO
 ```
 
-## ⚙️ Configuração
+> O arquivo `.env` já está listado no `.gitignore` e **não deve ser versionado**.
 
-### Criando um Bot no Discord
+### Criando um bot no Discord
 
 1. Acesse o [Discord Developer Portal](https://discord.com/developers/applications)
-2. Crie uma nova aplicação
-3. Vá em "Bot" e crie um bot
-4. Copie o token e adicione no arquivo `.env` como `BotDicord`
-5. Ative as seguintes permissões no bot:
-   - **Privileged Gateway Intents**: 
-     - Presence Intent
-     - Server Members Intent
-     - Message Content Intent
-   - **Bot Permissions**:
-     - Manage Channels
-     - Send Messages
-     - View Channels
+2. Crie uma nova aplicação e, em **Bot**, gere o token
+3. Adicione o token no `.env` como `BotDicord`
+4. Ative os **Privileged Gateway Intents**:
+   - Presence Intent
+   - Server Members Intent
+   - Message Content Intent
+5. Conceda permissões ao bot, no mínimo:
+   - Manage Channels
+   - Manage Roles
+   - Send Messages
+   - View Channels
+   - Manage Nicknames
 
-6. Convide o bot para seu servidor usando o seguinte link (substitua `CLIENT_ID` pelo ID da sua aplicação):
+6. Convide o bot para o servidor (substitua `CLIENT_ID`):
+
 ```
 https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=8&scope=bot%20applications.commands
 ```
@@ -81,140 +125,154 @@ https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=8&scope
 ### Obtendo API Key do Faceit
 
 1. Acesse o [Faceit Developer Portal](https://developers.faceit.com/)
-2. Crie uma conta ou faça login
-3. Crie uma nova aplicação
-4. Copie a API Key e adicione no arquivo `.env` como `ApiKeyFACEIT`
+2. Crie uma aplicação e copie a API Key
+3. Adicione no `.env` como `ApiKeyFACEIT`
 
-### Configurando IDs de Cargos
+### Cargos e permissões internas
 
-No arquivo `main.py`, configure os IDs dos cargos que podem usar comandos administrativos:
+Os IDs de cargos administrativos (**OWNER**, **STAFF**, **MODERADOR**, **Verificado**) são armazenados no banco SQLite após executar `/configbase`. Não é necessário editar IDs manualmente no código — o bot carrega esses valores automaticamente no `on_ready`.
 
-```python
-CEO = 1010316485211738203  # ID do cargo CEO
-ADM = 1360721686311338166  # ID do cargo ADM
-```
+O usuário que executa `/configbase` precisa possuir um cargo cujo nome contenha `OWNER` (padrão: `'👑┇OWNER`).
 
-## 🎮 Uso
+## Primeira execução
 
-Execute o bot com:
+Ordem recomendada para configurar um servidor novo:
+
+| Passo | Comando | Quem executa |
+|-------|---------|--------------|
+| 1 | `/createtables` | OWNER |
+| 2 | `/configbase` | OWNER |
+| 3 | `/criarlocaladm` | Staff (OWNER/STAFF/MODERADOR) |
+| 4 | `/painel_link` | Qualquer usuário (postar no canal de identificação) |
+| 5 | `/carregartime` | STAFF/OWNER (sincronizar cargos de times) |
+| 6 | `/painelagendamento` | Staff (postar painel de agendamento) |
+
+## Uso
+
+Execute o bot:
 
 ```bash
 python main.py
 ```
 
-O bot ficará online e responderá aos comandos slash no Discord.
+O bot sincroniza os slash commands no `setup_hook` e permanece online aguardando interações (comandos, botões e modals).
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 Discord/
 │
-├── main.py              # Arquivo principal do bot
-├── modulos.py           # Módulos com funções auxiliares (Faceit API)
-├── requirements.txt     # Dependências do projeto
+├── main.py              # Bot principal: eventos, views, modals e slash commands
+├── modulos.py           # Faceit API, MixCamp API, funções de banco e utilitários
+├── requirements.txt     # Dependências Python
 ├── .env                 # Variáveis de ambiente (não versionado)
-├── mixcamp.db          # Banco de dados SQLite (gerado automaticamente)
+├── .gitignore
 │
 └── db/
-    └── db.py           # Funções de conexão com o banco de dados
+    ├── db.py            # Conexão SQLite
+    └── sql/
+        └── mixcamp.db   # Banco de dados local (não versionado)
 ```
 
-## 📝 Comandos
+## Comandos
 
-### Comandos Administrativos
+### Configuração e administração
 
-#### `/criarcanais`
-Cria categorias e canais para os times do MixCamp.
-- **Permissão**: Apenas usuários com cargo CEO ou ADM
-- **Canais criados**:
-  - Categoria: 🎮 LEGALIZE
-    - chat-geral (texto)
-    - Sala 1 (voz)
-  - Categoria: 🎮 VAC5
-    - chat-geral (texto)
-    - Sala 1 (voz)
+| Comando | Descrição | Permissão |
+|---------|-----------|-----------|
+| `/configbase` | Cria cargos base e registra IDs no banco | Cargo OWNER |
+| `/createtables` | Cria tabelas SQLite | OWNER |
+| `/criarlocaladm` | Monta categorias, canais, webhooks e painéis (tickets, perfil, staff) | Staff |
+| `/carregartime` | Cria cargos de times com base na API do MixCamp | OWNER / STAFF |
+| `/criarcanais` | Cria categorias e canais para LEGALIZE e VAC5 | OWNER / STAFF |
+| `/deletarcanais` | Remove categorias e canais dos times acima | OWNER / STAFF |
 
-#### `/deletarcanais`
-Remove todas as categorias e canais dos times.
-- **Permissão**: Apenas usuários com cargo CEO ou ADM
+### Comunidade e perfil
 
-### Comandos Faceit
+| Comando | Descrição | Permissão |
+|---------|-----------|-----------|
+| `/painel_link` | Envia embed com botão para vincular conta do site | Público |
+| `/painelagendamento` | Abre painel interativo para agendar partidas | Staff |
+| `/veragendamentos` | Lista partidas (hoje / semana / todas) | Público |
+| `/mix` | Sorteia 10 jogadores entre dois times | Público |
+| `/help` | Comando de ajuda (utilitário interno) | Público |
 
-#### `/infoplayerfaceit`
-Busca informações completas de um jogador no Faceit.
-- **Parâmetros**:
-  - `nickname` (string): Nickname do jogador
-- **Retorna**:
-  - Nível do jogador
-  - Faceit ID e Steam ID
-  - Nicknames (Faceit e Steam)
-  - Link do perfil
+### MixCamp
 
-#### `/infohub`
-Busca informações sobre uma hub do Faceit.
-- **Parâmetros**:
-  - `hub_uuid` (string): UUID da hub (36 caracteres)
-- **Retorna**:
-  - Nome, ID e descrição da hub
-  - Região e Game ID
-  - Total de jogadores
-  - Níveis de skill mínimo e máximo
-  - Links de avatar e cover image
+| Comando | Parâmetros | Descrição | Permissão |
+|---------|------------|-----------|-----------|
+| `/infoplayermix` | `nickname` | Dados completos do player no MixCamp | OWNER / STAFF |
 
-#### `/infomembrohub`
-Verifica se um jogador é membro de uma hub específica.
-- **Parâmetros**:
-  - `hub_uuid` (string): UUID da hub (36 caracteres)
-  - `nickname` (string): Nickname do jogador
-- **Retorna**:
-  - Status de membro
-  - Roles do jogador na hub
-  - Link do perfil
+### Faceit
 
-#### `/infomatch`
-Busca informações sobre partidas em uma hub.
-- **Parâmetros**:
-  - `match_id` (string): ID da partida (36 caracteres)
-- **Retorna**:
-  - Nome da hub
-  - Match ID
-  - Mapas escolhidos
-  - Status da partida
+| Comando | Parâmetros | Descrição |
+|---------|------------|-----------|
+| `/infoplayerfaceit` | `nickname` | Perfil do jogador (nível, IDs, nicknames) |
+| `/infohub` | `hub_uuid` | Informações de uma hub (UUID com 36 caracteres) |
+| `/infomembrohub` | `hub_uuid`, `nickname` | Verifica membro e roles na hub |
+| `/infomatch` | `match_id` | Dados de uma partida (UUID com 36 caracteres) |
 
-#### `/help`
-Comando de ajuda (em desenvolvimento).
+### Interações persistentes (botões e modals)
 
-## 🔒 Segurança
+Além dos slash commands, o bot registra views persistentes no `on_ready`:
 
-- **Nunca compartilhe** seu arquivo `.env` ou tokens
-- Adicione `.env` ao `.gitignore` se versionar o projeto
-- Mantenha as permissões do bot no mínimo necessário
+- **LinkView / LinkModal** — vinculação de perfil do site
+- **PainelPerfilView** — atualização de perfil no Discord
+- **PainelAgendamento / ModalAgendarJogo** — agendamento de confrontos
+- **TicketView / TicketModal / CloseTicketView** — abertura e fechamento de tickets
 
-## 🐛 Troubleshooting
+## Banco de Dados
+
+O SQLite armazena três tabelas principais (criadas via `/createtables`):
+
+| Tabela | Finalidade |
+|--------|------------|
+| `usuarios_discord` | Vínculo Discord ↔ MixCamp, dados de time e perfil |
+| `sistema_discord` | IDs de cargos, canais, categorias e URLs de webhooks |
+| `tickets` | Registro de tickets abertos (tipo, status, canal, etc.) |
+
+Arquivo: `db/sql/mixcamp.db`
+
+## Segurança
+
+- **Nunca compartilhe** o arquivo `.env`, tokens ou API keys
+- O `.env` e `db/sql/` já estão no `.gitignore`
+- Conceda ao bot apenas as permissões necessárias
+- O comando `/infoplayermix` expõe dados sensíveis (e-mail, IDs) — restrito a staff
+
+## Troubleshooting
 
 ### Bot não responde aos comandos
-- Verifique se o bot está online
-- Confirme que os comandos foram sincronizados (o bot faz isso automaticamente no `setup_hook`)
-- Verifique as permissões do bot no servidor
+- Confirme que o bot está online
+- Verifique se os comandos foram sincronizados (ocorre automaticamente no startup)
+- Cheque permissões do bot no servidor
+
+### Erro ao vincular perfil ou buscar dados do MixCamp
+- Valide `ApiKeyMIXCAMP` e todas as variáveis `ROUTE_MIXCAMP_*` no `.env`
+- Confirme que a API do site está acessível
+- Execute `/createtables` e `/configbase` antes de usar painéis
 
 ### Erro ao buscar informações do Faceit
-- Verifique se a API Key está correta no `.env`
-- Confirme que a API Key tem as permissões necessárias
-- Verifique se o nickname/UUID fornecido está correto
+- Verifique `ApiKeyFACEIT` no `.env`
+- Confirme nickname/UUID informados
 
-### Erro de permissões
-- Confirme que o bot tem permissão para gerenciar canais
-- Verifique se os IDs dos cargos CEO e ADM estão corretos
+### Cargos ou canais não funcionam
+- Execute `/configbase` e `/criarlocaladm` na ordem correta
+- Confirme que o bot tem permissão para **Manage Channels** e **Manage Roles**
+- Use `/carregartime` para sincronizar cargos de times após alterações no site
 
-## 📄 Licença
+### Permissão negada em comandos administrativos
+- Os cargos OWNER/STAFF/MODERADOR são lidos do banco — rode `/configbase` primeiro
+- Reinicie o bot após alterações nos cargos registrados
 
-Este projeto é privado e destinado ao uso do MixCamp.
+## Licença
 
-## 👥 Contribuidores
+Projeto privado, destinado ao uso do MixCamp.
+
+## Contribuidores
 
 Desenvolvido para o MixCamp.
 
 ---
 
-**Nota**: Certifique-se de manter suas credenciais seguras e nunca as compartilhe publicamente.
-
+**Nota:** Mantenha credenciais e chaves de API seguras. Nunca as publique em repositórios públicos.

@@ -11,9 +11,7 @@ load_dotenv()
 webhook_url_perfil = os.getenv('ROUTE_PERFIL_WEHOOK')
 
 def PartidasAmistosaMix(playersSemDefinir):
-# def PartidasAmistosaMix():
     contador = 0
-    # playersSemDefinir = ['Lucas','João','Maria','Pedro','Ana','Bruno','Carla','Daniel','Eva','Fábio']
     playersDoTime1 = []
     playersDoTime2 = []
     
@@ -40,8 +38,6 @@ def PartidasAmistosaMix(playersSemDefinir):
     except Exception as e:
         print(f"Erro: {e}")
         return False
-
-# PartidasAmistosaMix()
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # ---------- FACEIT
