@@ -31,7 +31,7 @@ STAFF = None
 MODERADOR = None
 VERIFICADO = None
 CATEGORIATICKETID = None
-
+criarTableDb()
 
 @bot.event
 async def on_ready():

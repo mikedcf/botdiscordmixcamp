@@ -748,4 +748,3 @@ def listarPartidasMarcadas(periodo):
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-criarTableDb()
