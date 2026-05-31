@@ -221,80 +221,116 @@ def teste():
 
 def criarTableDb():
     try:
+        
 
         query = """ 
         CREATE TABLE IF NOT EXISTS usuarios_discord (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INT AUTO_INCREMENT PRIMARY KEY,
 
-            userdiscordid INTEGER,
-            usermixcampid INTEGER,
+            userdiscordid BIGINT,
+            usermixcampid BIGINT,
 
             username VARCHAR(50),
             usernamediscord VARCHAR(50),
 
-            steamid INTEGER,
+            steamid BIGINT,
             faceitid VARCHAR(50),
 
             avatar_url VARCHAR(255),
 
-            gerencia TEXT NOT NULL CHECK(gerencia IN ('admin', 'moderador', 'user', 'streamer')),
+            gerencia ENUM('admin', 'moderador', 'user', 'streamer') NOT NULL,
 
-            organizador TEXT CHECK(organizador IN ('premium', 'simples', 'null')), 
+            organizador ENUM('premium', 'simples') DEFAULT NULL,
 
-            lider_id INTEGER DEFAULT NULL,
+            lider_id INT DEFAULT NULL,
 
             nome_time VARCHAR(50) DEFAULT NULL,
             tag_time VARCHAR(50) DEFAULT NULL,
 
             avatar_time_url VARCHAR(255) DEFAULT NULL,
 
-            funcao_no_time TEXT CHECK(
-                funcao_no_time IN ('capitao', 'titular', 'reserva', 'coach')
+            funcao_no_time ENUM(
+                'capitao',
+                'titular',
+                'reserva',
+                'coach'
             ) DEFAULT NULL,
 
-            posicao_no_time TEXT CHECK(
-                posicao_no_time IN ('awp', 'entry', 'support', 'igl', 'sub', 'coach', 'lurker', 'rifle','capitao')
+            posicao_no_time ENUM(
+                'awp',
+                'entry',
+                'support',
+                'igl',
+                'sub',
+                'coach',
+                'lurker',
+                'rifle',
+                'capitao'
             ) DEFAULT NULL,
 
-            time_id INTEGER DEFAULT NULL,
+            time_id INT DEFAULT NULL,
 
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         """
         conectar(query)
        
         query = """ 
         CREATE TABLE IF NOT EXISTS sistema_discord (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tipo TEXT NOT NULL CHECK(tipo IN ('cargos', 'canal', 'categoria')),
-            id_tipo INTEGER DEFAULT NULL,
+            id INT AUTO_INCREMENT PRIMARY KEY,
+
+            tipo ENUM('cargos', 'canal', 'categoria') NOT NULL,
+
+            id_tipo BIGINT DEFAULT NULL,
+
             nome_tipo VARCHAR(255) NOT NULL,
+
             webhook_url TEXT DEFAULT NULL,
+
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         """
         conectar(query)
 
         query = """
         CREATE TABLE IF NOT EXISTS tickets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userid INTEGER,
+            id INT AUTO_INCREMENT PRIMARY KEY,
+
+            userid BIGINT,
+
             username VARCHAR(50),
-            tipo TEXT NOT NULL CHECK(tipo IN ('bug', 'report', 'tecnico', 'sugestao', 'duvidas')),
+
+            tipo ENUM(
+                'bug',
+                'report',
+                'tecnico',
+                'sugestao',
+                'duvidas'
+            ) NOT NULL,
+
             problema TEXT,
-            status BOOLEAN DEFAULT TRUE,
-            number_ticket INTEGER,
-            cargo_id INTEGER,
-            canal_id INTEGER,
+
+            status TINYINT(1) DEFAULT TRUE,
+
+            number_ticket INT,
+
+            cargo_id BIGINT,
+
+            canal_id BIGINT,
+
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         """
         
         conectar(query)
 
+        print('Tabelas criadas com  sucesso')
+
         return True
 
     except Exception as e:
+        print(f'Erro ao criar tabelas: {e}')
         return False
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -354,7 +390,7 @@ def getDadosUserCompleto(idMixcamp):
     
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
-            print('ok')
+            
             return {'status': True, 'data': response.json()}
         else:
             print(response.json())
@@ -379,6 +415,24 @@ def getSeasons():
     except Exception as e:
         print(f"Erro: {e}")
         return {'status': False}
+
+
+def getTimesAllCampeonatos(seasonID):
+   
+    try:
+        url = f'{os.getenv(f'ROUTE_CAMPEONATOS_BY_SEASON_TIMES')}{seasonID}'
+        headers = {
+            "x-api-key": os.getenv("ApiKeyMIXCAMP")
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return {'status': True, 'data': response.json()}
+        else:
+            return {'status': False}
+    except Exception as e:
+        print(f"Erro: {e}")
+        return {'status': False}
+
 
 def getAgendamentos():
     try:
@@ -424,6 +478,21 @@ def playerMixcamp(nickname):
 
 # -------- POST
 
+def enviarNotificacaoSiteMixcamp(userid,mensagem):
+    try:
+        url = os.getenv('ROUTE_NOTIFICACOES_CRIAR_DISCORD')
+        headers = {
+            "x-api-key": os.getenv("ApiKeyMIXCAMP")
+        }
+        response = requests.post(url, json={'usuario_id': userid, 'texto': mensagem}, headers=headers)
+
+        if response.status_code == 200:
+            return {'status': True, 'data': response.json()}
+        else:
+            print(response.status_code)
+    except Exception as e:
+        return {'status': False, 'mensagem': f'Erro: {e}'}
+
 
 # -------- PUT
 
@@ -437,17 +506,19 @@ def playerMixcamp(nickname):
 # -------- GET
 def getDadosSistema(tipo): 
     try:
-        query = f"SELECT * FROM sistema_discord WHERE nome_tipo = ?"
-        response = conectar(query, (tipo,))
+        query = f"SELECT * FROM sistema_discord WHERE nome_tipo = %s"
+        response = conectar(query, (tipo,), fetch=True)
         return {'status': True, 'data': response[0]}
 
     except Exception as e:
+        print(f"Erro: {e}")
         return {'status': False}
+
 
 def getNumeroTicket():
     try: 
         query = f"SELECT MAX(number_ticket) FROM tickets"
-        response = conectar(query)
+        response = conectar(query,fetch=True)
         
         return {'status': True, 'data': response[0][0]}
     except Exception as e:
@@ -455,16 +526,17 @@ def getNumeroTicket():
 
 def getDadosTicket(coluna,valor):
     try:
-        query = f"SELECT * FROM tickets WHERE {coluna} = ?"
-        response = conectar(query, (valor,))
+        query = f"SELECT * FROM tickets WHERE {coluna} = %s"
+        response = conectar(query, (valor,),fetch=True)
         return {'status': True, 'data': response[0]}
     except Exception as e:
+        print(f"Erro: {e}")
         return {'status': False}
 
 def getDadosUserDiscord(userId):
     try:
-        query = f"SELECT * FROM usuarios_discord WHERE userdiscordid = ?"
-        response = conectar(query, (userId,))
+        query = f"SELECT * FROM usuarios_discord WHERE userdiscordid = %s"
+        response = conectar(query, (userId,),fetch=True)
         return {'status': True, 'data': response[0]}
     except Exception as e:
         print(f"Erro: {e}")
@@ -474,15 +546,15 @@ def getDadosUserDiscord(userId):
 # -------- POST
 def ArmazenarDadoSistema(cargo,canal,categoria,webhook):
     try:
-        conectar('INSERT INTO sistema_discord (tipo,id_tipo,nome_tipo,webhook_url) VALUES (?,?,?,?)',(cargo,canal,categoria,webhook))
+        conectar('INSERT INTO sistema_discord (tipo,id_tipo,nome_tipo,webhook_url) VALUES (%s, %s, %s, %s)',(cargo,canal,categoria,webhook),fetch=True)
         return True
     except Exception as e:
         return False
 
 def armazenarDadosTicket(userid,username,tipo,problema,number_ticket,cargo_id,canal_id):
     try:
-        query = f"INSERT INTO tickets (userid,username,tipo,problema,number_ticket,cargo_id,canal_id) VALUES (?,?,?,?,?,?,?)"
-        conectar(query, (userid,username,tipo,problema,number_ticket,cargo_id,canal_id))
+        query = f"INSERT INTO tickets (userid,username,tipo,problema,number_ticket,cargo_id,canal_id) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        conectar(query, (userid,username,tipo,problema,number_ticket,cargo_id,canal_id),fetch=True)
         return True
     except Exception as e:
         return False
@@ -490,11 +562,11 @@ def armazenarDadosTicket(userid,username,tipo,problema,number_ticket,cargo_id,ca
 def ArmazenarDadosUserDiscord(userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador='',lider_id=None,nome_time=None,tag_time=None,avatar_time_url=None,funcao_no_time=None,posicao_no_time=None,time_id=None):
     try:
         if lider_id == None:
-            query = f"INSERT INTO usuarios_discord (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador) VALUES (?,?,?,?,?,?,?,?,?)"
-            conectar(query, (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador))
+            query = f"INSERT INTO usuarios_discord (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            conectar(query, (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador),fetch=True)
         else:
-            query = f"INSERT INTO usuarios_discord (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador,lider_id,nome_time,tag_time,avatar_time_url,funcao_no_time,posicao_no_time,time_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-            conectar(query, (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador,lider_id,nome_time,tag_time,avatar_time_url,funcao_no_time,posicao_no_time,time_id))
+            query = f"INSERT INTO usuarios_discord (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador,lider_id,nome_time,tag_time,avatar_time_url,funcao_no_time,posicao_no_time,time_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            conectar(query, (userdiscordid,usermixcampid,username,usernamediscord,steamid,faceitid,avatar_url,gerencia,organizador,lider_id,nome_time,tag_time,avatar_time_url,funcao_no_time,posicao_no_time,time_id),fetch=True)
 
         return True
     except Exception as e:
@@ -541,16 +613,16 @@ def AmarzenarAgendamento(idMixcamp,primeiroTime,segundoTime,dataJogo,horario,sea
 def AtualizarDadosTicket(numberTicket,status):
 
     try:
-        query = f"UPDATE tickets SET status = ? WHERE number_ticket = ?"
-        conectar(query, (status,numberTicket))
+        query = f"UPDATE tickets SET status = %s WHERE number_ticket = %s"
+        conectar(query, (status,numberTicket),fetch=True)
         return True
     except Exception as e:
         return False
 
 def atualiiarDadosUserDiscord(coluna,valor,id):
     try:
-        query = f"UPDATE usuarios_discord SET {coluna} = ? WHERE id = ?"
-        conectar(query, (valor,id))
+        query = f"UPDATE usuarios_discord SET {coluna} = %s WHERE id = %s"
+        conectar(query, (valor,id),fetch=True)
         return True
     except Exception as e:
         print(f"Erro: {e}")

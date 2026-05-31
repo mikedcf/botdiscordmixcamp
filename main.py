@@ -39,23 +39,26 @@ async def on_ready():
     
     verificarExiste = getDadosSistema('owner')
     if verificarExiste['status']:
-        CEO = verificarExiste['data'][2]
+        CEO = verificarExiste['data']['id_tipo']
+
 
     verificarExiste = getDadosSistema('staff')
     if verificarExiste['status']:
-        STAFF = verificarExiste['data'][2]
+        STAFF = verificarExiste['data']['id_tipo']
 
     verificarExiste = getDadosSistema('moderador')
     if verificarExiste['status']:
-        MODERADOR = verificarExiste['data'][2]
+        MODERADOR = verificarExiste['data']['id_tipo']
 
     verificarExiste = getDadosSistema('verificado')
     if verificarExiste['status']:
-        VERIFICADO = verificarExiste['data'][2]
+        VERIFICADO = verificarExiste['data']['id_tipo']
 
     verificarExiste = getDadosSistema('ca-suport')
     if verificarExiste['status']:
-        CATEGORIATICKETID = verificarExiste['data'][2]
+        CATEGORIATICKETID = verificarExiste['data']['id_tipo']
+
+    
 
     
 
@@ -67,6 +70,9 @@ async def on_ready():
     bot.add_view(PainelAgendamento())
 
 
+    await bot.tree.sync()
+
+
     print(f"Bot online como {bot.user}")
 
 async def AtualizarIdCargos():
@@ -74,23 +80,24 @@ async def AtualizarIdCargos():
     
     verificarExiste = getDadosSistema('owner')
     if verificarExiste['status']:
-        CEO = verificarExiste['data'][2]
+        CEO = verificarExiste['data']['id_tipo']
+
 
     verificarExiste = getDadosSistema('staff')
     if verificarExiste['status']:
-        STAFF = verificarExiste['data'][2]
+        STAFF = verificarExiste['data']['id_tipo']
 
     verificarExiste = getDadosSistema('moderador')
     if verificarExiste['status']:
-        MODERADOR = verificarExiste['data'][2]
+        MODERADOR = verificarExiste['data']['id_tipo']
 
     verificarExiste = getDadosSistema('verificado')
     if verificarExiste['status']:
-        VERIFICADO = verificarExiste['data'][2]
+        VERIFICADO = verificarExiste['data']['id_tipo']
 
     verificarExiste = getDadosSistema('ca-suport')
     if verificarExiste['status']:
-        CATEGORIATICKETID = verificarExiste['data'][2]
+        CATEGORIATICKETID = verificarExiste['data']['id_tipo']
      
 def check_staff():
     async def predicate(interaction: discord.Interaction):
@@ -130,7 +137,7 @@ async def AtualizarCargoTimes(guild):
             mentionable=True
         )
 
-    webhook_url = getDadosSistema('c-logs')['data'][4]
+    webhook_url = getDadosSistema('c-logs')['data']['webhook_url']
     
     data = {
         "content": "✅ **Cargos de times carregados com sucesso!**"
@@ -144,10 +151,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
     userDiscordID = interaction.user.id
     #2- puxar o dados do desse usuario no banco de dados do sql lite e comparar se existe
     dadosUserDiscord = getDadosUserDiscord(userDiscordID)
-    idUserDiscord = dadosUserDiscord['data'][0]
+    idUserDiscord = dadosUserDiscord['data']['userdiscordid']
     if dadosUserDiscord['status']:
-        idMixcamp = dadosUserDiscord['data'][2]
-        timeIdDiscord = dadosUserDiscord['data'][16]
+        idMixcamp = dadosUserDiscord['data']['usermixcampid']
+        timeIdDiscord = dadosUserDiscord['data']['time_id']
 
         dadosUserCompleto = getDadosUserCompleto(idMixcamp)
         if dadosUserCompleto['status']:
@@ -162,6 +169,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
             gerencia = dadosUserCompleto['data']['userDados'][0]['gerencia']
             organizador = dadosUserCompleto['data']['userDados'][0]['organizador']
             cores_perfil = dadosUserCompleto['data']['userDados'][0]['cores_perfil']
+            cores_perfil = cores_perfil[:7]
             link_cfg = dadosUserCompleto['data']['userDados'][0]['cfg_cs']
             discord_url = dadosUserCompleto['data']['userDados'][0]['discord_url']
             youtube_url = dadosUserCompleto['data']['userDados'][0]['youtube_url']
@@ -219,11 +227,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                     total_membros = dadosUserCompleto['data']['userDados'][0]['total_membros']
                                     total_conquistas_time = dadosUserCompleto['data']['userDados'][0]['total_conquistas_time']
 
+                                    
+
                                     embed = discord.Embed(
-                                        title=f"👤 {username} • Perfil Competitivo",
+                                        title=f"`👤` {username} • Perfil Competitivo",
                                         description=(
-                                            f"🏆 Perfil competitivo MIXCAMP\n"
-                                            f"🎮 Jogador competitivo de CS2"
+                                            f"`🏆` Perfil competitivo MIXCAMP\n"
+                                            f"`🎮` Jogador competitivo de CS2"
                                         ),
                                         color=discord.Color.from_str(cores_perfil)
                                     )
@@ -244,13 +254,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                     # =========================================================
 
                                     embed.add_field(
-                                        name="🆔 Informações Gerais",
+                                        name="`🆔` Informações Gerais",
                                         value=(
-                                            f"🆔 ID: `{idMixcamp}`\n"
-                                            f"👤 Username: `{username}`\n"
-                                            f"📧 Email: `{email}`\n"
-                                            f"🛡️ Gerência: `{gerencia}`\n"
-                                            f"💎 Organizador: `{organizador}`"
+                                            f"`🆔` ID: `{idMixcamp}`\n"
+                                            f"`👤` Username: `{username}`\n"
+                                            f"`📧` Email: `{email}`\n"
+                                            f"`🛡️` Gerência: `{gerencia}`\n"
+                                            f"`💎` Organizador: `{organizador}`"
                                         ),
                                         inline=False
                                     )
@@ -260,12 +270,12 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                     # =========================================================
 
                                     embed.add_field(
-                                        name="🎮 Competitivo",
+                                        name="`🎮` Competitivo",
                                         value=(
-                                            f"🚂 SteamID: `{steamid}`\n"
-                                            f"🎯 FACEIT ID: `{faceitid}`\n"
-                                            f"🎖️ Função: `{funcao_no_time}`\n"
-                                            f"📍 Posição Principal: `{posicao_no_time}`"
+                                            f"`🚂` SteamID: `{steamid}`\n"
+                                            f"`🎯` FACEIT ID: `{faceitid}`\n"
+                                            f"`🎖️` Função: `{funcao_no_time}`\n"
+                                            f"`📍` Posição Principal: `{posicao_no_time}`"
                                         ),
                                         inline=False
                                     )
@@ -275,14 +285,14 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                     # =========================================================
 
                                     embed.add_field(
-                                        name="👥 Time",
+                                        name="`👥` Time",
                                         value=(
-                                            f"🆔 ID: `{timeIdMixcamp}`\n"
-                                            f"🏷️ Nome: `{nomeDoTimeNovo}`\n"
-                                            f"🏷️ Tag: `{tag_time}`\n"
-                                            f"👑 Líder ID: `{lider_id}`\n"
-                                            f"👥 Total de membros: `{total_membros}`\n"
-                                            f"🏆 Conquistas: `{total_conquistas_time}`"
+                                            f"`🆔` ID: `{timeIdMixcamp}`\n"
+                                            f"`🏷️` Nome: `{nomeDoTimeNovo}`\n"
+                                            f"`🏷️` Tag: `{tag_time}`\n"
+                                            f"`👑` Líder ID: `{lider_id}`\n"
+                                            f"`👥` Total de membros: `{total_membros}`\n"
+                                            f"`🏆` Conquistas: `{total_conquistas_time}`"
                                         ),
                                         inline=False
                                     )
@@ -292,10 +302,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                     # =========================================================
 
                                     embed.add_field(
-                                        name="📊 Estatísticas",
+                                        name="`📊` Estatísticas",
                                         value=(
-                                            f"🏅 Medalhas: `{total_medalhas}`\n"
-                                            f"🎬 Destaques: `{total_destaques}`"
+                                            f"`🏅` Medalhas: `{total_medalhas}`\n"
+                                            f"`🎬` Destaques: `{total_destaques}`"
                                         ),
                                         inline=True
                                     )
@@ -305,7 +315,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                     # =========================================================
 
                                     embed.add_field(
-                                        name="🎯 Roles",
+                                        name="`🎯` Roles",
                                         value=f"```{posicoes}```",
                                         inline=True
                                     )
@@ -350,7 +360,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                         redes.append(f"[AllStar]({allstar_url})")
 
                                     embed.add_field(
-                                        name="🌐 Redes Sociais",
+                                        name="`🌐` Redes Sociais",
                                         value=" • ".join(redes),
                                         inline=False
                                     )
@@ -361,7 +371,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                                     if link_cfg:
                                         embed.add_field(
-                                            name="⚙️ CFG CS2",
+                                            name="`⚙️` CFG CS2",
                                             value=f"[📥 Download CFG]({link_cfg})",
                                             inline=False
                                         )
@@ -418,22 +428,22 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                     atualiiarDadosUserDiscord('funcao_no_time',funcao_no_time,idUserDiscord)
                                     atualiiarDadosUserDiscord('posicao_no_time',posicao_no_time,idUserDiscord)
 
-                                    if username != dadosUserDiscord['data'][3]:
+                                    if username != dadosUserDiscord['data']['username']:
                                         atualiiarDadosUserDiscord('username',username,idUserDiscord)
 
-                                    if steamid != dadosUserDiscord['data'][5]:
+                                    if steamid != dadosUserDiscord['data']['steamid']:
                                         atualiiarDadosUserDiscord('steamid',steamid,idUserDiscord)
 
-                                    if faceitid != dadosUserDiscord['data'][6]:
+                                    if faceitid != dadosUserDiscord['data']['faceitid']:
                                         atualiiarDadosUserDiscord('faceitid',faceitid,idUserDiscord)
 
-                                    if avatar_url != dadosUserDiscord['data'][7]:
+                                    if avatar_url != dadosUserDiscord['data']['avatar_url']:
                                         atualiiarDadosUserDiscord('avatar_url',avatar_url,idUserDiscord)
 
-                                    if gerencia != dadosUserDiscord['data'][8]:
+                                    if gerencia != dadosUserDiscord['data']['gerencia']:
                                         atualiiarDadosUserDiscord('gerencia',gerencia,idUserDiscord)
 
-                                    if organizador != dadosUserDiscord['data'][9]:
+                                    if organizador != dadosUserDiscord['data']['organizador']:
                                         atualiiarDadosUserDiscord('organizador',organizador,idUserDiscord)
 
                                     break
@@ -448,10 +458,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                         total_conquistas_time = dadosUserCompleto['data']['userDados'][0]['total_conquistas_time']
 
                         embed = discord.Embed(
-                            title=f"👤 {username} • Perfil Competitivo",
+                            title=f"`👤` {username} • Perfil Competitivo",
                             description=(
-                                f"🏆 Perfil competitivo MIXCAMP\n"
-                                f"🎮 Jogador competitivo de CS2"
+                                f"`🏆` Perfil competitivo MIXCAMP\n"
+                                f"`🎮` Jogador competitivo de CS2"
                             ),
                             color=discord.Color.from_str(cores_perfil)
                         )
@@ -472,13 +482,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                         # =========================================================
 
                         embed.add_field(
-                            name="🆔 Informações Gerais",
+                            name="`🆔` Informações Gerais",
                             value=(
-                                f"🆔 ID: `{idMixcamp}`\n"
-                                f"👤 Username: `{username}`\n"
-                                f"📧 Email: `{email}`\n"
-                                f"🛡️ Gerência: `{gerencia}`\n"
-                                f"💎 Organizador: `{organizador}`"
+                                f"`🆔` ID: `{idMixcamp}`\n"
+                                f"`👤` Username: `{username}`\n"
+                                f"`📧` Email: `{email}`\n"
+                                f"`🛡️` Gerência: `{gerencia}`\n"
+                                f"`💎` Organizador: `{organizador}`"
                             ),
                             inline=False
                         )
@@ -488,12 +498,12 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                         # =========================================================
 
                         embed.add_field(
-                            name="🎮 Competitivo",
+                            name="`🎮` Competitivo",
                             value=(
-                                f"🚂 SteamID: `{steamid}`\n"
-                                f"🎯 FACEIT ID: `{faceitid}`\n"
-                                f"🎖️ Função: `{funcao_no_time}`\n"
-                                f"📍 Posição Principal: `{posicao_no_time}`"
+                                f"`🚂` SteamID: `{steamid}`\n"
+                                f"`🎯` FACEIT ID: `{faceitid}`\n"
+                                f"`🎖️` Função: `{funcao_no_time}`\n"
+                                f"`📍` Posição Principal: `{posicao_no_time}`"
                             ),
                             inline=False
                         )
@@ -503,14 +513,14 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                         # =========================================================
 
                         embed.add_field(
-                            name="👥 Time",
+                            name="`👥` Time",
                             value=(
-                                f"🆔 ID: `{timeIdMixcamp}`\n"
+                                f"`🆔` ID: `{timeIdMixcamp}`\n"
                                 f"🏷️ Nome: `{nomeDoTimeNovo}`\n"
-                                f"🏷️ Tag: `{tag_time}`\n"
-                                f"👑 Líder ID: `{lider_id}`\n"
-                                f"👥 Total de membros: `{total_membros}`\n"
-                                f"🏆 Conquistas: `{total_conquistas_time}`"
+                                f"`🏷️` Tag: `{tag_time}`\n"
+                                f"`👑` Líder ID: `{lider_id}`\n"
+                                f"`👥` Total de membros: `{total_membros}`\n"
+                                f"`🏆` Conquistas: `{total_conquistas_time}`"
                             ),
                             inline=False
                         )
@@ -520,10 +530,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                         # =========================================================
 
                         embed.add_field(
-                            name="📊 Estatísticas",
+                            name="`📊` Estatísticas",
                             value=(
-                                f"🏅 Medalhas: `{total_medalhas}`\n"
-                                f"🎬 Destaques: `{total_destaques}`"
+                                f"`🏅` Medalhas: `{total_medalhas}`\n"
+                                f"`🎬` Destaques: `{total_destaques}`"
                             ),
                             inline=True
                         )
@@ -533,7 +543,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                         # =========================================================
 
                         embed.add_field(
-                            name="🎯 Roles",
+                            name="`🎯` Roles",
                             value=f"```{posicoes}```",
                             inline=True
                         )
@@ -578,7 +588,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                             redes.append(f"[AllStar]({allstar_url})")
 
                         embed.add_field(
-                            name="🌐 Redes Sociais",
+                            name="`🌐` Redes Sociais",
                             value=" • ".join(redes),
                             inline=False
                         )
@@ -589,7 +599,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                         if link_cfg:
                             embed.add_field(
-                                name="⚙️ CFG CS2",
+                                name="`⚙️` CFG CS2",
                                 value=f"[📥 Download CFG]({link_cfg})",
                                 inline=False
                             )
@@ -639,43 +649,43 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                         await interaction.user.edit(nick=f"{novoApelido}┇{username}")
 
 
-                        if username != dadosUserDiscord['data'][3]:
+                        if username != dadosUserDiscord['data']['username']:
                             atualiiarDadosUserDiscord('username',username,idUserDiscord)
 
-                        if steamid != dadosUserDiscord['data'][5]:
+                        if steamid != dadosUserDiscord['data']['steamid']:
                             atualiiarDadosUserDiscord('steamid',steamid,idUserDiscord)
 
-                        if faceitid != dadosUserDiscord['data'][6]:
+                        if faceitid != dadosUserDiscord['data']['faceitid']:
                             atualiiarDadosUserDiscord('faceitid',faceitid,idUserDiscord)
 
-                        if avatar_url != dadosUserDiscord['data'][7]:
+                        if avatar_url != dadosUserDiscord['data']['avatar_url']:
                             atualiiarDadosUserDiscord('avatar_url',avatar_url,idUserDiscord)
 
-                        if gerencia != dadosUserDiscord['data'][8]:
+                        if gerencia != dadosUserDiscord['data']['gerencia']:
                             atualiiarDadosUserDiscord('gerencia',gerencia,idUserDiscord)
 
-                        if organizador != dadosUserDiscord['data'][9]:
+                        if organizador != dadosUserDiscord['data']['organizador']:
                             atualiiarDadosUserDiscord('organizador',organizador,idUserDiscord)
 
-                        if timeIdMixcamp != dadosUserDiscord['data'][16]:
+                        if timeIdMixcamp != dadosUserDiscord['data']['time_id']:
                             atualiiarDadosUserDiscord('time_id',timeIdMixcamp,idUserDiscord)
 
-                        if lider_id != dadosUserDiscord['data'][10]:
+                        if lider_id != dadosUserDiscord['data']['lider_id']:
                             atualiiarDadosUserDiscord('lider_id',lider_id,idUserDiscord)
 
-                        if nomeDoTimeNovo != dadosUserDiscord['data'][11]:
+                        if nomeDoTimeNovo != dadosUserDiscord['data']['nome_time']:
                             atualiiarDadosUserDiscord('nome_time',nomeDoTimeNovo,idUserDiscord)
 
-                        if tag_time != dadosUserDiscord['data'][12]:
+                        if tag_time != dadosUserDiscord['data']['tag_time']:
                             atualiiarDadosUserDiscord('tag_time',tag_time,idUserDiscord)
 
-                        if avatar_time_url != dadosUserDiscord['data'][13]:
+                        if avatar_time_url != dadosUserDiscord['data']['avatar_time_url']:
                             atualiiarDadosUserDiscord('avatar_time_url',avatar_time_url,idUserDiscord)
 
-                        if funcao_no_time != dadosUserDiscord['data'][14]:
+                        if funcao_no_time != dadosUserDiscord['data']['funcao_no_time']:
                             atualiiarDadosUserDiscord('funcao_no_time',funcao_no_time,idUserDiscord)
 
-                        if posicao_no_time != dadosUserDiscord['data'][15]:
+                        if posicao_no_time != dadosUserDiscord['data']['posicao_no_time']:
                             atualiiarDadosUserDiscord('posicao_no_time',posicao_no_time,idUserDiscord)
                 else:
                     formatarNomeTime = []
@@ -693,10 +703,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                 break
 
                     embed = discord.Embed(
-                        title=f"👤 {username} • Perfil Competitivo",
+                        title=f"`👤` {username} • Perfil Competitivo",
                         description=(
-                            "🏆 Perfil competitivo MIXCAMP\n"
-                            "🎮 Jogador competitivo de CS2"
+                            "`🏆` Perfil competitivo MIXCAMP\n"
+                            "`🎮` Jogador competitivo de CS2"
                         ),
                         color=discord.Color.from_str(cores_perfil)
                     )
@@ -712,13 +722,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                     # =========================================================
 
                     embed.add_field(
-                        name="🆔 Informações Gerais",
+                        name="`🆔` Informações Gerais",
                         value=(
-                            f"🆔 ID: `{idMixcamp}`\n"
-                            f"👤 Username: `{username}`\n"
-                            f"📧 Email: `{email}`\n"
-                            f"🛡️ Gerência: `{gerencia}`\n"
-                            f"💎 Organizador: `{organizador}`"
+                            f"`🆔` ID: `{idMixcamp}`\n"
+                            f"`👤` Username: `{username}`\n"
+                            f"`📧` Email: `{email}`\n"
+                            f"`🛡️` Gerência: `{gerencia}`\n"
+                            f"`💎` Organizador: `{organizador}`"
                         ),
                         inline=False
                     )
@@ -728,10 +738,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                     # =========================================================
 
                     embed.add_field(
-                        name="🎮 Competitivo",
+                        name="`🎮` Competitivo",
                         value=(
-                            f"🚂 SteamID: `{steamid}`\n"
-                            f"🎯 FACEIT ID: `{faceitid}`"
+                            f"`🚂` SteamID: `{steamid}`\n"
+                            f"`🎯` FACEIT ID: `{faceitid}`"
                         ),
                         inline=False
                     )
@@ -741,10 +751,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                     # =========================================================
 
                     embed.add_field(
-                        name="📊 Estatísticas",
+                        name="`📊` Estatísticas",
                         value=(
-                            f"🏅 Medalhas: `{total_medalhas}`\n"
-                            f"🎬 Destaques: `{total_destaques}`"
+                            f"`🏅` Medalhas: `{total_medalhas}`\n"
+                            f"`🎬` Destaques: `{total_destaques}`"
                         ),
                         inline=True
                     )
@@ -754,7 +764,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                     # =========================================================
 
                     embed.add_field(
-                        name="🎯 Roles",
+                        name="`🎯` Roles",
                         value=f"```{posicoes}```",
                         inline=True
                     )
@@ -801,7 +811,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                     if len(redes) > 0:
 
                         embed.add_field(
-                            name="🌐 Redes Sociais",
+                            name="`🌐` Redes Sociais",
                             value=" • ".join(redes),
                             inline=False
                         )
@@ -813,7 +823,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                     if link_cfg:
 
                         embed.add_field(
-                            name="⚙️ CFG CS2",
+                            name="`⚙️` CFG CS2",
                             value=f"[📥 Download CFG]({link_cfg})",
                             inline=False
                         )
@@ -920,10 +930,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                 atualiiarDadosUserDiscord('posicao_no_time',None,idUserDiscord)
 
                 embed = discord.Embed(
-                    title=f"👤 {username} • Perfil Competitivo",
+                    title=f"`👤` {username} • Perfil Competitivo",
                     description=(
-                        "🏆 Perfil competitivo MIXCAMP\n"
-                        "🎮 Jogador competitivo de CS2"
+                        "`🏆` Perfil competitivo MIXCAMP\n"
+                        "`🎮` Jogador competitivo de CS2"
                     ),
                     color=discord.Color.from_str(cores_perfil)
                 )
@@ -939,13 +949,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                 # =========================================================
 
                 embed.add_field(
-                    name="🆔 Informações Gerais",
+                    name="`🆔` Informações Gerais",
                     value=(
-                        f"🆔 ID: `{idMixcamp}`\n"
-                        f"👤 Username: `{username}`\n"
-                        f"📧 Email: `{email}`\n"
-                        f"🛡️ Gerência: `{gerencia}`\n"
-                        f"💎 Organizador: `{organizador}`"
+                        f"`🆔` ID: `{idMixcamp}`\n"
+                        f"`👤` Username: `{username}`\n"
+                        f"`📧` Email: `{email}`\n"
+                        f"`🛡️` Gerência: `{gerencia}`\n"
+                        f"`💎` Organizador: `{organizador}`"
                     ),
                     inline=False
                 )
@@ -955,10 +965,10 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                 # =========================================================
 
                 embed.add_field(
-                    name="🎮 Competitivo",
+                    name="`🎮` Competitivo",
                     value=(
-                        f"🚂 SteamID: `{steamid}`\n"
-                        f"🎯 FACEIT ID: `{faceitid}`"
+                        f"`🚂` SteamID: `{steamid}`\n"
+                        f"`🎯` FACEIT ID: `{faceitid}`"
                     ),
                     inline=False
                 )
@@ -970,8 +980,8 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                 embed.add_field(
                     name="📊 Estatísticas",
                     value=(
-                        f"🏅 Medalhas: `{total_medalhas}`\n"
-                        f"🎬 Destaques: `{total_destaques}`"
+                        f"`🏅` Medalhas: `{total_medalhas}`\n"
+                        f"`🎬` Destaques: `{total_destaques}`"
                     ),
                     inline=True
                 )
@@ -981,7 +991,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                 # =========================================================
 
                 embed.add_field(
-                    name="🎯 Roles",
+                    name="`🎯` Roles",
                     value=f"```{posicoes}```",
                     inline=True
                 )
@@ -1028,7 +1038,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                 if len(redes) > 0:
 
                     embed.add_field(
-                        name="🌐 Redes Sociais",
+                        name="`🌐` Redes Sociais",
                         value=" • ".join(redes),
                         inline=False
                     )
@@ -1040,7 +1050,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                 if link_cfg:
 
                     embed.add_field(
-                        name="⚙️ CFG CS2",
+                        name="`⚙️` CFG CS2",
                         value=f"[📥 Download CFG]({link_cfg})",
                         inline=False
                     )
@@ -1100,6 +1110,195 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
         )
         return
 
+
+async def criarCanaisTimes(interaction: discord.Interaction,listaDeTimesDoCampeonato: list):
+
+    guild = interaction.guild
+
+    if not guild:
+        return await interaction.response.send_message("Erro: servidor não encontrado.", ephemeral=True)
+
+    for time in listaDeTimesDoCampeonato:
+        categoria = await guild.create_category(f"🎮 {time}")
+        await guild.create_text_channel("chat-geral", category=categoria)
+        await guild.create_voice_channel("Sala 1", category=categoria)
+
+    await interaction.response.send_message("Categorias e canais criados com sucesso!")
+
+# =========================================================
+# CONFIG CAMPEONATOS PARA CRIAÇÃO DE SALAS DE TIMES AUTOMÁTICAS
+# =========================================================
+
+campeonatos = [
+    "mx_league",
+]
+
+seasons_campeonatos = {
+    "mx_league": []
+}
+
+# =========================================================
+
+# =========================================================
+# SELECT DE SEASON
+# =========================================================
+
+class SelectSeasonCampeonato(discord.ui.Select):
+
+    def __init__(self, campeonato):
+
+        seasons = seasons_campeonatos.get(campeonato, [])
+
+        options = [
+            discord.SelectOption(
+                label=season,
+                value=season
+            )
+            for season in seasons
+        ]
+
+        super().__init__(
+            placeholder="Escolha a season",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+        self.campeonato = campeonato
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
+        season_escolhida = self.values[0]
+        season_escolhida = season_escolhida.split(' ')[1]
+
+        listaDeTimesDoCampeonato = getTimesAllCampeonatos(season_escolhida)['data']
+        await criarCanaisTimes(interaction,listaDeTimesDoCampeonato)
+
+        await interaction.followup.send(
+            f"🏆 Campeonato: {self.campeonato}\n📅 Season: {season_escolhida}",
+            ephemeral=True
+        )
+        
+# =========================================================
+# VIEW DE SEASON
+# =========================================================
+
+class ViewSeason(discord.ui.View):
+
+    def __init__(self, campeonato):
+        super().__init__(timeout=None)
+
+        self.add_item(SelectSeasonCampeonato(campeonato))
+
+# =========================================================
+# SELECT DE CAMPEONATO
+# =========================================================
+
+class SelectCampeonato(discord.ui.Select):
+
+    def __init__(self):
+
+        options = [
+            discord.SelectOption(
+                label=camp,
+                value=camp
+            )
+            for camp in campeonatos
+        ]
+
+        super().__init__(
+            placeholder="Escolha o campeonato",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+
+        # VF
+
+        verificaPermissao = False
+
+
+        for nameroles in interaction.guild.roles:
+            if nameroles.name == '@everyone':
+                pass
+            else:
+                cargoNome = nameroles.name.split('┇')[1].strip().lower()
+                print(cargoNome)
+
+                if cargoNome == 'owner':
+                    verificaPermissao = True
+
+        print(verificaPermissao)
+
+        if verificaPermissao == False:
+            print('1')
+            await interaction.response.send_message(
+                "❌ Você não possui permissão para selecionar um campeonato.",
+                ephemeral=True
+            )
+            return
+        else:
+            print('2')
+
+
+            campeonato_escolhido = self.values[0]
+
+            listaDaSeasons = getSeasons()
+
+            if listaDaSeasons['status']:
+                for season in listaDaSeasons['data']['seasons']:
+                    seasons_campeonatos["mx_league"].append(f"Season {season}")
+
+
+
+            await interaction.response.send_message(
+                f"🏆 Campeonato selecionado: {campeonato_escolhido}",
+                view=ViewSeason(campeonato_escolhido),
+                ephemeral=True
+            )
+
+# =========================================================
+# VIEW CAMPEONATO
+# =========================================================
+
+class ViewCampeonato(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+        self.add_item(SelectCampeonato())
+
+# =========================================================
+# BOTÃO PRINCIPAL
+# =========================================================
+
+class PainelCampeonato(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="Selecionar Campeonato",
+        style=discord.ButtonStyle.primary,
+        emoji="🏆"
+    )
+    async def selecionar(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button
+    ):
+
+        await interaction.response.send_message(
+            "Escolha um campeonato:",
+            view=ViewCampeonato(),
+            ephemeral=True
+        )
+
+# =========================================================
+# =========================================================
 
 class PainelPerfilView(discord.ui.View):
     def __init__(self):
@@ -1377,6 +1576,16 @@ class LinkModal(discord.ui.Modal):
                 ephemeral=True
             )
 
+        verificarUserExistente =getDadosUserDiscord(interaction.user.id)
+
+        if verificarUserExistente['status']:
+            await interaction.followup.send(
+                "❌ Você já está registrado no MixCamp.",
+                ephemeral=True
+            )
+            return
+
+
 
 
         dados = Verificar_extrairID(url)
@@ -1479,7 +1688,7 @@ class LinkModal(discord.ui.Modal):
 
                     
 
-                    webhook_url = getDadosSistema('c-logs')['data'][4]
+                    webhook_url = getDadosSistema('c-logs')['data']['webhook_url']
 
                     embed = {
                         "title": "✅ Dados armazenados com sucesso!",
@@ -1560,6 +1769,11 @@ class LinkModal(discord.ui.Modal):
 
                     requests.post(webhook_url, json=data)
 
+                    msg = f"usuario @{interaction.user.name} do discord foi associado a sua conta no MixCamp!"
+
+
+                    enviarNotificacaoSiteMixcamp(UserMixcampID,msg)
+
                 
                     await interaction.followup.send('✅**Você foi registrado no cargo do seu time.**', ephemeral=True)
                     await interaction.followup.send(f'✅**Seu apelido foi alterado para {novoApelido} **', ephemeral=True)
@@ -1587,7 +1801,7 @@ class LinkModal(discord.ui.Modal):
 
                     ArmazenarDadosUserDiscord(interaction.user.id,UserMixcampID,usernameMixcamp,interaction.user.name,steamID,faceitID,avatarURL,gerencia,organizador)
 
-                    webhook_url = getDadosSistema('c-logs')['data'][4]
+                    webhook_url = getDadosSistema('c-logs')['data']['webhook_url']
 
                     embed = {
                         "title": "✅ Dados armazenados com sucesso!",
@@ -1641,9 +1855,16 @@ class LinkModal(discord.ui.Modal):
                         "embeds": [embed]
                     }
 
+
                     requests.post(webhook_url, json=data)
 
-                    canalPerfilId = getDadosSistema('c-perfil')['data'][2]
+                    canalPerfilId = getDadosSistema('c-perfil')['data']['id_tipo']
+
+
+                    msg = f"usuario @{interaction.user.name} do discord foi associado a sua conta no MixCamp!"
+
+
+                    enviarNotificacaoSiteMixcamp(UserMixcampID,msg)
                     
 
 
@@ -2054,37 +2275,7 @@ async def criar_ticket(interaction, tipo, descricao):
 @bot.tree.command(name='help', description='Se precisar de ajuda relacionado ao mixcamp é so perguntar!')
 
 async def teste(interaction: discord.Interaction, sobre: str):
-    timesMixcamp = GetTimes()
-    times = []
-    cargosDiscord = []
-
-    for time in timesMixcamp:
-        times.append(time.lower())
-    
-
-    for roles in interaction.guild.roles:
-        if roles.name == '@everyone':
-            pass
-        else:
-            CargoTimeRole = roles.name.split('┇')[1].strip().lower()
-            cargosDiscord.append(CargoTimeRole)
-
-    for time in times:
-        if time not in cargosDiscord:
-            await interaction.guild.create_role(
-            name=f'.🥋┇ {time.upper()}',
-            colour=discord.Colour.blue(),
-            hoist=True,
-            mentionable=True
-        )
-
-    webhook_url = getDadosSistema('c-logs')['data'][4]
-
-    data = {
-        "content": "✅ **Cargos de times carregados com sucesso!**"
-    }
-    requests.post(webhook_url, json=data)
-
+    print(CEO, STAFF, MODERADOR, VERIFICADO, CATEGORIATICKETID)
 # ------------------------------------------------
 # ================= FUNÇÕES BASE ===========
 # ------------------------------------------------
@@ -2355,7 +2546,7 @@ async def mix(interaction: discord.Interaction, time1: str, time2: str, nomeplay
 # ================= SISTEMA DE TICKETS ===========
 # ------------------------------------------------
 
-# @app_commands.checks.has_any_role(CEO, STAFF)
+
 @bot.tree.command(name="criarlocaladm", description="Criar sistema de admistração do discord")
 @check_staff()
 async def criarCategoriaTicket(interaction: discord.Interaction):
@@ -2424,13 +2615,23 @@ async def criarCategoriaTicket(interaction: discord.Interaction):
 
 
     await canal_perfil.send(
-    embed=embed,
-    view=PainelPerfilView()
-)
+        embed=embed,
+        view=PainelPerfilView()
+    )
+
+    canal_chat = await guild.create_text_channel("💬⡇𝐆𝐞𝐫𝐚𝐥", category=categoria_bemvindos)
+    canal_chat_webhook = await canal_chat.create_webhook(name="MIXCAMP")
+    canal_chat_id = canal_chat.id
+
+    verificarExiste = getDadosSistema('c-chat_geral')
+    if verificarExiste['status']:
+        pass
+    else:
+        ArmazenarDadoSistema("canal",canal_chat_id,"c-chat_geral",canal_chat_webhook.url)
 
     # criando_categoria_tickets e canal de abertura de tickets
     categoria = await guild.create_category(f"ܔܔܢܜܔܢ🔧𝑺𝒖𝒑𝒐𝒓𝒕🔧ܜܔܔܢܜ")
-    canal = await guild.create_text_channel("🎫⡇abrir-tickets", category=categoria)
+    canal = await guild.create_text_channel("🎫⡇𝐚𝐛𝐫𝐢𝐫-𝐭𝐢𝐜𝐤𝐞𝐭𝐬",category=categoria)
 
     CATEGORIATICKETID = categoria.id
     SALATICKET_ID = canal.id
@@ -2471,6 +2672,26 @@ async def criarCategoriaTicket(interaction: discord.Interaction):
     embed.set_footer(text="MiXCAMP Suporte")
 
     await canal.send(embed=embed, view=TicketView())
+
+
+    # criando_categoria_ranking e canal de ranking
+    categoria_ranking = await guild.create_category(f"ܔܔܢܜܔܢ🏆 𝐂𝐀𝐌𝐏𝐄𝐎𝐍𝐀𝐓𝐎 🏆ܜܔܔܢܜ")
+    canal_ranking = await guild.create_text_channel("📊⡇𝐫𝐚𝐧𝐤𝐢𝐧𝐠",category=categoria_ranking)
+    webhook_ranking = await canal_ranking.create_webhook(name="MIXCAMP")
+
+    verificarExiste = getDadosSistema('ca-ranking')
+
+    if verificarExiste['status']:
+        pass
+    else:
+        ArmazenarDadoSistema("categoria",categoria_ranking.id,"ca-ranking","")
+
+    verificarExiste = getDadosSistema('c-ranking')
+
+    if verificarExiste['status']:
+        pass
+    else:
+        ArmazenarDadoSistema("categoria",canal_ranking.id,"c-ranking",webhook_ranking.url)
 
 
     
@@ -2811,21 +3032,32 @@ async def infoPlayerMix(interaction: discord.Interaction, nickname: str):
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # ---------- SISTEMA DE CRIAR CANAIS
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+@bot.tree.command(name="painelcreatesalastimes", description="Painel para criar salas de times automáticas")
+async def campeonatos_cmd(interaction: discord.Interaction):
+
+    await interaction.response.send_message(
+        "Painel de campeonatos:",
+        view=PainelCampeonato()
+    )
+
+
 @bot.tree.command(name="criarcanais", description="Criar canais para os times do MIXCAMP")
 @app_commands.checks.has_any_role(CEO, STAFF)
 async def criar_canais(interaction: discord.Interaction):
-    times = ['LEGALIZE', 'VAC5']
-    guild = interaction.guild
+    ...
+    # if getTimesAllCampeonatos()
+    # guild = interaction.guild
 
-    if not guild:
-        return await interaction.response.send_message("Erro: servidor não encontrado.", ephemeral=True)
+    # if not guild:
+    #     return await interaction.response.send_message("Erro: servidor não encontrado.", ephemeral=True)
 
-    for time in times:
-        categoria = await guild.create_category(f"🎮 {time}")
-        await guild.create_text_channel("chat-geral", category=categoria)
-        await guild.create_voice_channel("Sala 1", category=categoria)
+    # for time in times:
+    #     categoria = await guild.create_category(f"🎮 {time}")
+    #     await guild.create_text_channel("chat-geral", category=categoria)
+    #     await guild.create_voice_channel("Sala 1", category=categoria)
 
-    await interaction.response.send_message("Categorias e canais criados com sucesso!")
+    # await interaction.response.send_message("Categorias e canais criados com sucesso!")
 
 
 @bot.tree.command(name="deletarcanais", description="Deletar canais dos times do MIXCAMP")
