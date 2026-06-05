@@ -29,6 +29,7 @@ bot = MixcampBot()
 CEO = None
 STAFF = None
 MODERADOR = None
+STREAMER = None
 VERIFICADO = None
 CATEGORIATICKETID = None
 criarTableDb()
@@ -98,17 +99,21 @@ async def AtualizarIdCargos():
     verificarExiste = getDadosSistema('ca-suport')
     if verificarExiste['status']:
         CATEGORIATICKETID = verificarExiste['data']['id_tipo']
+
+    verificarExiste = getDadosSistema('streamer')
+    if verificarExiste['status']:
+        STREAMER = verificarExiste['data']['id_tipo']
      
 def check_staff():
     async def predicate(interaction: discord.Interaction):
         global CEO, STAFF
 
-        if CEO is None or STAFF is None or MODERADOR is None:
+        if CEO is None or STAFF is None or MODERADOR is None or STREAMER is None:
             return False
 
         roles_user = [role.id for role in interaction.user.roles]
 
-        return CEO in roles_user or STAFF in roles_user or MODERADOR in roles_user
+        return CEO in roles_user or STAFF in roles_user or MODERADOR in roles_user or STREAMER in roles_user
 
     return app_commands.check(predicate)
 
@@ -405,11 +410,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                                     if gerencia == 'admin':
                                         novoApelido = novoApelido +'⚙️'
+                                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
                                     elif gerencia == 'moderador':
                                         novoApelido = novoApelido +'🛡️'
-
+                                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
                                     elif gerencia == 'streamer':
                                         novoApelido = novoApelido + '🎥'
+                                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
 
                                     if organizador == 'premium':
                                         novoApelido = novoApelido + '🏆'
@@ -633,12 +640,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                         if gerencia == 'admin':
                             novoApelido = novoApelido +'⚙️'
+                            await interaction.user.add_roles(interaction.guild.get_role(STAFF))
                         elif gerencia == 'moderador':
                             novoApelido = novoApelido +'🛡️'
-                            
+                            await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
                         elif gerencia == 'streamer':
                             novoApelido = novoApelido + '🎥'
-
+                            await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
                         if organizador == 'premium':
                             novoApelido = novoApelido + '🏆'
 
@@ -854,12 +862,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                     if gerencia == 'admin':
                         novoApelido = novoApelido +'⚙️'
+                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
                     elif gerencia == 'moderador':
                         novoApelido = novoApelido +'🛡️'
-                        
+                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
                     elif gerencia == 'streamer':
                         novoApelido = novoApelido + '🎥'
-
+                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
                     if organizador == 'premium':
                         novoApelido = novoApelido + '🏆'
 
@@ -1076,12 +1085,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                 if gerencia == 'admin':
                     novoApelido = novoApelido +'⚙️'
+                    await interaction.user.add_roles(interaction.guild.get_role(STAFF))
                 elif gerencia == 'moderador':
                     novoApelido = novoApelido +'🛡️'
-                    
+                    await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
                 elif gerencia == 'streamer':
                     novoApelido = novoApelido + '🎥'
-
+                    await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
                 if organizador == 'premium':
                     novoApelido = novoApelido + '🏆'
 
@@ -1231,17 +1241,17 @@ class SelectCampeonato(discord.ui.Select):
                 if cargoNome == 'owner':
                     verificaPermissao = True
 
-        print(verificaPermissao)
+        
 
         if verificaPermissao == False:
-            print('1')
+            
             await interaction.response.send_message(
                 "❌ Você não possui permissão para selecionar um campeonato.",
                 ephemeral=True
             )
             return
         else:
-            print('2')
+            
 
 
             campeonato_escolhido = self.values[0]
@@ -1641,15 +1651,18 @@ class LinkModal(discord.ui.Modal):
                     
                     if gerencia == 'admin':
                         novoApelido = novoApelido +'⚙️'
+                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
 
                     elif gerencia == 'moderador':
                         novoApelido = novoApelido +'🛡️'
+                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
 
                     elif gerencia == 'Coach':
                         novoApelido = novoApelido + '🎧'
 
                     elif gerencia == 'streamer':
                         novoApelido = novoApelido + '🎥'
+                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
 
                     if organizador == 'premium':
                         novoApelido = novoApelido + '🏆'
@@ -1782,9 +1795,13 @@ class LinkModal(discord.ui.Modal):
                 else:
                     if gerencia == 'admin':
                         novoApelido = novoApelido +'👷'+ f'┇ {usernameMixcamp}'
+                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
                     elif gerencia == 'moderador':
                         novoApelido = novoApelido +'🛡️'+ f'┇ {usernameMixcamp}'
-
+                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
+                    elif gerencia == 'streamer':
+                        novoApelido = novoApelido + '🎥'+ f'┇ {usernameMixcamp}'
+                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
                     if organizador == 'premium':
                         novoApelido = novoApelido + '🏆'+ f'┇ {usernameMixcamp}'
 
@@ -3040,24 +3057,7 @@ async def campeonatos_cmd(interaction: discord.Interaction):
         "Painel de campeonatos:",
         view=PainelCampeonato()
     )
-
-
-@bot.tree.command(name="criarcanais", description="Criar canais para os times do MIXCAMP")
-@app_commands.checks.has_any_role(CEO, STAFF)
-async def criar_canais(interaction: discord.Interaction):
-    ...
-    # if getTimesAllCampeonatos()
-    # guild = interaction.guild
-
-    # if not guild:
-    #     return await interaction.response.send_message("Erro: servidor não encontrado.", ephemeral=True)
-
-    # for time in times:
-    #     categoria = await guild.create_category(f"🎮 {time}")
-    #     await guild.create_text_channel("chat-geral", category=categoria)
-    #     await guild.create_voice_channel("Sala 1", category=categoria)
-
-    # await interaction.response.send_message("Categorias e canais criados com sucesso!")
+    
 
 
 @bot.tree.command(name="deletarcanais", description="Deletar canais dos times do MIXCAMP")
