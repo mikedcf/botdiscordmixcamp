@@ -620,6 +620,8 @@ def AtualizarDadosTicket(numberTicket,status):
         return False
 
 def atualiiarDadosUserDiscord(coluna,valor,id):
+
+    print(coluna,valor,id)
     try:
         query = f"UPDATE usuarios_discord SET {coluna} = %s WHERE id = %s"
         conectar(query, (valor,id),fetch=True)
