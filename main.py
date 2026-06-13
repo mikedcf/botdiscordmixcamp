@@ -77,7 +77,7 @@ async def on_ready():
     print(f"Bot online como {bot.user}")
 
 async def AtualizarIdCargos():
-    global CEO, STAFF, MODERADOR, VERIFICADO, CATEGORIATICKETID
+    global CEO, STAFF, MODERADOR, VERIFICADO, CATEGORIATICKETID, STREAMER
     
     verificarExiste = getDadosSistema('owner')
     if verificarExiste['status']:
@@ -1663,9 +1663,6 @@ class LinkModal(discord.ui.Modal):
                     elif gerencia == 'streamer':
                         novoApelido = novoApelido + '🎥'
                         cargo = interaction.guild.get_role(STREAMER)
-
-                        print(f"Cargo encontrado: {cargo}")
-                        print(STREAMER)
                         await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
 
                     if organizador == 'premium':
@@ -2447,7 +2444,7 @@ async def painel_link(interaction: discord.Interaction):
         title="**﹌﹌﹌﹌﹌﹌﹌`🔗`VINCULAR CONTA ﹌﹌﹌﹌﹌﹌﹌ **",
         description=(
             "**Para Liberar as salas do discord faça seu registro seguindo a passo a passo:**\n\n"
-            "`1️⃣` **Acesse o site do MIXCAMP:\n https://mikedcf.github.io/mixcamp/frontend/html/login.html**\n"
+            "`1️⃣` **Acesse o site do MIXCAMP:\n https://mixcamp.online/frontend/html/login.html**\n"
             "`2️⃣` **acesse seu perfil e copia a url alguma coisa com final como:\n perfil.html?id=**\n"
             "`3️⃣` **No discord Clique no botão abaixo**\n"
             "`4️⃣` **Cole o link do seu Perfil**\n"
