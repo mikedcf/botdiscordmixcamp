@@ -1662,6 +1662,10 @@ class LinkModal(discord.ui.Modal):
 
                     elif gerencia == 'streamer':
                         novoApelido = novoApelido + '🎥'
+                        cargo = interaction.guild.get_role(STREAMER)
+
+                        print(f"Cargo encontrado: {cargo}")
+                        print(STREAMER)
                         await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
 
                     if organizador == 'premium':
