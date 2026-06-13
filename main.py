@@ -63,10 +63,9 @@ async def on_ready():
     if verificarExiste['status']:
         STREAMER = verificarExiste['data']['id_tipo']
 
-    
+    print(STREAMER)
 
     
-
     bot.add_view(TicketView())
     bot.add_view(CloseTicketView())
     bot.add_view(LinkModal())
@@ -110,7 +109,7 @@ async def AtualizarIdCargos():
      
 def check_staff():
     async def predicate(interaction: discord.Interaction):
-        global CEO, STAFF
+        global CEO, STAFF, MODERADOR, STREAMER
 
         if CEO is None or STAFF is None or MODERADOR is None or STREAMER is None:
             return False
