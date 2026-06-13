@@ -59,11 +59,11 @@ async def on_ready():
     if verificarExiste['status']:
         CATEGORIATICKETID = verificarExiste['data']['id_tipo']
 
-    verificarExiste = getDadosSistema('ca-suport')
+    verificarExiste = getDadosSistema('streamer')
     if verificarExiste['status']:
         STREAMER = verificarExiste['data']['id_tipo']
 
-    print(STREAMER)
+    
 
     
     bot.add_view(TicketView())
@@ -418,6 +418,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
                                         novoApelido = novoApelido +'🛡️'
                                         await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
                                     elif gerencia == 'streamer':
+                                        print(STREAMER)
                                         novoApelido = novoApelido + '🎥'
                                         await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
 
