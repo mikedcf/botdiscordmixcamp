@@ -453,9 +453,11 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                                     if gerencia != dadosUserDiscord['data']['gerencia']:
                                         atualiiarDadosUserDiscord('gerencia',gerencia,idUserDiscord)
+                                    print(organizador)
 
                                     if organizador != dadosUserDiscord['data']['organizador']:
                                         atualiiarDadosUserDiscord('organizador',organizador,idUserDiscord)
+
 
                                     break
                     else:
@@ -675,6 +677,8 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                         if gerencia != dadosUserDiscord['data']['gerencia']:
                             atualiiarDadosUserDiscord('gerencia',gerencia,idUserDiscord)
+
+                        print(organizador)
 
                         if organizador != dadosUserDiscord['data']['organizador']:
                             atualiiarDadosUserDiscord('organizador',organizador,idUserDiscord)

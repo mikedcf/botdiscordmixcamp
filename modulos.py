@@ -240,7 +240,7 @@ def criarTableDb():
 
             gerencia ENUM('admin', 'moderador', 'user', 'streamer') NOT NULL,
 
-            organizador ENUM('premium', 'simples') DEFAULT NULL,
+            organizador ENUM('premium', 'intermediario', 'basico') DEFAULT 'null',
 
             lider_id INT DEFAULT NULL,
 
