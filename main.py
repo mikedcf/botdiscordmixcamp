@@ -36,7 +36,7 @@ criarTableDb()
 
 @bot.event
 async def on_ready():
-    global CEO, STAFF, MODERADOR, VERIFICADO, CATEGORIATICKETID
+    global CEO, STAFF, MODERADOR, VERIFICADO, CATEGORIATICKETID, STREAMER
     
     verificarExiste = getDadosSistema('owner')
     if verificarExiste['status']:
@@ -54,6 +54,10 @@ async def on_ready():
     verificarExiste = getDadosSistema('verificado')
     if verificarExiste['status']:
         VERIFICADO = verificarExiste['data']['id_tipo']
+
+    verificarExiste = getDadosSistema('streamer')
+    if verificarExiste['status']:
+        STREAMER = verificarExiste['data']['id_tipo']
 
     verificarExiste = getDadosSistema('ca-suport')
     if verificarExiste['status']:
@@ -103,7 +107,14 @@ async def AtualizarIdCargos():
     verificarExiste = getDadosSistema('streamer')
     if verificarExiste['status']:
         STREAMER = verificarExiste['data']['id_tipo']
-     
+
+async def adicionar_cargo(membro, guild, id_cargo):
+    if id_cargo is None:
+        return
+    cargo = guild.get_role(id_cargo)
+    if cargo:
+        await membro.add_roles(cargo)
+
 def check_staff():
     async def predicate(interaction: discord.Interaction):
         global CEO, STAFF
@@ -410,13 +421,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                                     if gerencia == 'admin':
                                         novoApelido = novoApelido +'⚙️'
-                                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
+                                        await adicionar_cargo(interaction.user, interaction.guild, STAFF)
                                     elif gerencia == 'moderador':
                                         novoApelido = novoApelido +'🛡️'
-                                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
+                                        await adicionar_cargo(interaction.user, interaction.guild, MODERADOR)
                                     elif gerencia == 'streamer':
                                         novoApelido = novoApelido + '🎥'
-                                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
+                                        await adicionar_cargo(interaction.user, interaction.guild, STREAMER)
 
                                     if organizador == 'premium':
                                         novoApelido = novoApelido + '🏆'
@@ -640,13 +651,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                         if gerencia == 'admin':
                             novoApelido = novoApelido +'⚙️'
-                            await interaction.user.add_roles(interaction.guild.get_role(STAFF))
+                            await adicionar_cargo(interaction.user, interaction.guild, STAFF)
                         elif gerencia == 'moderador':
                             novoApelido = novoApelido +'🛡️'
-                            await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
+                            await adicionar_cargo(interaction.user, interaction.guild, MODERADOR)
                         elif gerencia == 'streamer':
                             novoApelido = novoApelido + '🎥'
-                            await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
+                            await adicionar_cargo(interaction.user, interaction.guild, STREAMER)
                         if organizador == 'premium':
                             novoApelido = novoApelido + '🏆'
 
@@ -862,13 +873,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                     if gerencia == 'admin':
                         novoApelido = novoApelido +'⚙️'
-                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
+                        await adicionar_cargo(interaction.user, interaction.guild, STAFF)
                     elif gerencia == 'moderador':
                         novoApelido = novoApelido +'🛡️'
-                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
+                        await adicionar_cargo(interaction.user, interaction.guild, MODERADOR)
                     elif gerencia == 'streamer':
                         novoApelido = novoApelido + '🎥'
-                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
+                        await adicionar_cargo(interaction.user, interaction.guild, STREAMER)
                     if organizador == 'premium':
                         novoApelido = novoApelido + '🏆'
 
@@ -1085,13 +1096,13 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
 
                 if gerencia == 'admin':
                     novoApelido = novoApelido +'⚙️'
-                    await interaction.user.add_roles(interaction.guild.get_role(STAFF))
+                    await adicionar_cargo(interaction.user, interaction.guild, STAFF)
                 elif gerencia == 'moderador':
                     novoApelido = novoApelido +'🛡️'
-                    await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
+                    await adicionar_cargo(interaction.user, interaction.guild, MODERADOR)
                 elif gerencia == 'streamer':
                     novoApelido = novoApelido + '🎥'
-                    await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
+                    await adicionar_cargo(interaction.user, interaction.guild, STREAMER)
                 if organizador == 'premium':
                     novoApelido = novoApelido + '🏆'
 
@@ -1651,19 +1662,18 @@ class LinkModal(discord.ui.Modal):
                     
                     if gerencia == 'admin':
                         novoApelido = novoApelido +'⚙️'
-                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
+                        await adicionar_cargo(interaction.user, interaction.guild, STAFF)
 
                     elif gerencia == 'moderador':
                         novoApelido = novoApelido +'🛡️'
-                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
+                        await adicionar_cargo(interaction.user, interaction.guild, MODERADOR)
 
                     elif gerencia == 'Coach':
                         novoApelido = novoApelido + '🎧'
 
                     elif gerencia == 'streamer':
                         novoApelido = novoApelido + '🎥'
-                        cargo = interaction.guild.get_role(STREAMER)
-                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
+                        await adicionar_cargo(interaction.user, interaction.guild, STREAMER)
 
                     if organizador == 'premium':
                         novoApelido = novoApelido + '🏆'
@@ -1693,9 +1703,7 @@ class LinkModal(discord.ui.Modal):
                                 await interaction.user.edit(nick=f"{novoApelido}")
                                 break
 
-                    role = interaction.guild.get_role(VERIFICADO)
-                    if role:
-                        await interaction.user.add_roles(role)
+                    await adicionar_cargo(interaction.user, interaction.guild, VERIFICADO)
 
 
                     ArmazenarDadosUserDiscord(interaction.user.id,UserMixcampID,usernameMixcamp,interaction.user.name,steamID,faceitID,avatarURL,gerencia,organizador,liderTimeID,nomeTime,tagTime,avatarTimeURL,funcaoDoUserNoTime,posicaoDoUserNoTime,timeID)
@@ -1796,13 +1804,13 @@ class LinkModal(discord.ui.Modal):
                 else:
                     if gerencia == 'admin':
                         novoApelido = novoApelido +'👷'+ f'┇ {usernameMixcamp}'
-                        await interaction.user.add_roles(interaction.guild.get_role(STAFF))
+                        await adicionar_cargo(interaction.user, interaction.guild, STAFF)
                     elif gerencia == 'moderador':
                         novoApelido = novoApelido +'🛡️'+ f'┇ {usernameMixcamp}'
-                        await interaction.user.add_roles(interaction.guild.get_role(MODERADOR))
+                        await adicionar_cargo(interaction.user, interaction.guild, MODERADOR)
                     elif gerencia == 'streamer':
                         novoApelido = novoApelido + '🎥'+ f'┇ {usernameMixcamp}'
-                        await interaction.user.add_roles(interaction.guild.get_role(STREAMER))
+                        await adicionar_cargo(interaction.user, interaction.guild, STREAMER)
                     if organizador == 'premium':
                         novoApelido = novoApelido + '🏆'+ f'┇ {usernameMixcamp}'
 
@@ -1813,9 +1821,7 @@ class LinkModal(discord.ui.Modal):
                         novoApelido = novoApelido + f'┇ {usernameMixcamp}'
 
                     await interaction.user.edit(nick=f"{novoApelido}")
-                    role = interaction.guild.get_role(VERIFICADO)
-                    if role:
-                        await interaction.user.add_roles(role)
+                    await adicionar_cargo(interaction.user, interaction.guild, VERIFICADO)
 
                     ArmazenarDadosUserDiscord(interaction.user.id,UserMixcampID,usernameMixcamp,interaction.user.name,steamID,faceitID,avatarURL,gerencia,organizador)
 
