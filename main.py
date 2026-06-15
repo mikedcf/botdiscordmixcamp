@@ -25,6 +25,8 @@ class MixcampBot(discord.Client):
         await self.tree.sync()
 
 bot = MixcampBot()
+intents = discord.Intents.default()
+intents.members = True
 
 CEO = None
 STAFF = None
@@ -34,6 +36,10 @@ VERIFICADO = None
 CATEGORIATICKETID = None
 criarTableDb()
 
+
+# =========================================================
+# CONFIG CAMPEONATOS PARA CRIAÇÃO DE SALAS DE TIMES AUTOMÁTICAS
+# =========================================================
 @bot.event
 async def on_ready():
     global CEO, STAFF, MODERADOR, VERIFICADO, CATEGORIATICKETID, STREAMER
@@ -78,6 +84,46 @@ async def on_ready():
 
 
     print(f"Bot online como {bot.user}")
+
+@bot.event
+async def on_member_join(member):
+    idCanal = getDadosSistema('c-chegou')['data']['id_tipo']
+    canal = bot.get_channel(idCanal)
+    nameuser = member.name.upper()
+
+    if canal:
+        await canal.send(f"**Novo membro {member.name.upper()} entrou no servidor!**")
+
+    msg = f"""
+    **Bem-vindo ao servidor!**
+    **Se oriente pelos passos abaixo:**
+    **1- acesse a aba regras e leia o arquivo para ficar informado sobre as regras do servidor.**
+    **2- acesse o site e crie sua conta caso não tenha uma link -> mixcamp.online**
+    **3- após criar sua conta acesse a aba indentificação do discord com link do seu perfil.**
+    **4- após inserir o link você estára registrado automaticamamente no discord.**
+    **5- na aba PERFIL clique em atualizar perfil assim que registrar no discord e todas mudanças de dados na sua conta no site.**
+    **Se você tiver alguma dúvida, não exite em abrir um ticket para solicitar ajuda.**
+    **O Site e o discord estão em periodo de testes e pode aver algum problema, caso sofra algum problema entre em contato suport.**
+    **todos são bem vindos e esperamos que se divirtam lembrando sempre respeitar as regras e manter o ambiente agradavel!**
+    **Obrigado por entrar no servidor!**
+    **"VEM QUE É GG!"**
+    """
+    await member.send(msg)
+
+@bot.event
+async def on_member_remove(member):
+
+    print(f"Membro {member.name} saiu do servidor")
+    idCanal = getDadosSistema('c-vazou')['data']['id_tipo']
+    canal = bot.get_channel(idCanal)
+    if canal:
+        await canal.send(f"**Membro** {member.name} **saiu do servidor**")
+
+
+# =========================================================
+
+
+
 
 async def AtualizarIdCargos():
     global CEO, STAFF, MODERADOR, VERIFICADO, CATEGORIATICKETID, STREAMER
