@@ -215,8 +215,7 @@ def MatchFaceit(match_id):
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # ---------- TABELAS
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def teste():
-    conectar("DROP TABLE usuarios_discord")
+
 
 
 def criarTableDb():
@@ -240,7 +239,7 @@ def criarTableDb():
 
             gerencia ENUM('admin', 'moderador', 'user', 'streamer') NOT NULL,
 
-            organizador ENUM('premium', 'intermediario', 'basico') DEFAULT 'null',
+            organizador ENUM('premium', 'intermediario', 'basico') DEFAULT NULL,
 
             lider_id INT DEFAULT NULL,
 
@@ -360,6 +359,8 @@ def GetTimes():
     except Exception as e:
         print(f"Erro: {e}")
         return False
+
+
 
 def DadosplayerID(id):
     try:
@@ -621,7 +622,7 @@ def AtualizarDadosTicket(numberTicket,status):
 
 def atualiiarDadosUserDiscord(coluna,valor,id):
 
-    print(coluna,valor,id)
+    
     try:
         query = f"UPDATE usuarios_discord SET {coluna} = %s WHERE id = %s"
         conectar(query, (valor,id),fetch=True)

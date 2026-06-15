@@ -192,7 +192,7 @@ async def MostrarOuAtualizarPerfil(interaction: discord.Interaction):
             allstar_url = dadosUserCompleto['data']['userDados'][0]['allstar_url']
             total_medalhas = dadosUserCompleto['data']['userDados'][0]['total_medalhas']
             total_destaques = dadosUserCompleto['data']['userDados'][0]['total_destaques']
-            print(organizador)
+            
 
             if gerencia == 'streammer':
                 gerencia = 'streamer'
